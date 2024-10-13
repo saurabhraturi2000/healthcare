@@ -7,21 +7,16 @@ export interface Patient extends Models.Document {
   phone: string;
   birthDate: Date;
   gender: Gender;
-  address: string;
   occupation: string;
+  // age: string;
+  bloodGroup: string;
+  chronicDiseases: string | undefined;
+  address: string;
+  allergies: string | undefined;
+  pastMedicalHistory: string | undefined;
   emergencyContactName: string;
   emergencyContactNumber: string;
-  primaryPhysician: string;
-  insuranceProvider: string;
-  insurancePolicyNumber: string;
-  allergies: string | undefined;
-  currentMedication: string | undefined;
   familyMedicalHistory: string | undefined;
-  pastMedicalHistory: string | undefined;
-  identificationType: string | undefined;
-  identificationNumber: string | undefined;
-  identificationDocument: FormData | undefined;
-  privacyConsent: boolean;
 }
 
 export interface Appointment extends Models.Document {

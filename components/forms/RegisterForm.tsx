@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,9 +9,7 @@ import { z } from "zod";
 import { Form, FormControl } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { SelectItem } from "@/components/ui/select";
 import {
-  Doctors,
   GenderOptions,
   // IdentificationTypes,
   PatientFormDefaultValues,
@@ -44,19 +41,6 @@ const RegisterForm = ({ user }: { user: User }) => {
     setIsLoading(true);
 
     // Store file info in form data as
-    let formData;
-    if (
-      values.identificationDocument &&
-      values.identificationDocument?.length > 0
-    ) {
-      const blobFile = new Blob([values.identificationDocument[0]], {
-        type: values.identificationDocument[0].type,
-      });
-
-      formData = new FormData();
-      formData.append("blobFile", blobFile);
-      formData.append("fileName", values.identificationDocument[0].name);
-    }
 
     try {
       const patient = {
@@ -64,31 +48,23 @@ const RegisterForm = ({ user }: { user: User }) => {
         name: values.name,
         email: values.email,
         phone: values.phone,
+        bloodGroup: values.bloodGroup,
         birthDate: new Date(values.birthDate),
         gender: values.gender,
         address: values.address,
         occupation: values.occupation,
         emergencyContactName: values.emergencyContactName,
         emergencyContactNumber: values.emergencyContactNumber,
-        primaryPhysician: values.primaryPhysician,
-        insuranceProvider: values.insuranceProvider,
-        insurancePolicyNumber: values.insurancePolicyNumber,
         allergies: values.allergies,
-        currentMedication: values.currentMedication,
+        chronicDiseases: values.chronicDiseases,
         familyMedicalHistory: values.familyMedicalHistory,
         pastMedicalHistory: values.pastMedicalHistory,
-        // identificationType: values.identificationType,
-        // identificationNumber: values.identificationNumber,
-        // identificationDocument: values.identificationDocument
-        //   ? formData
-        //   : undefined,
-        privacyConsent: values.privacyConsent,
       };
 
       const newPatient = await registerPatient(patient);
 
       if (newPatient) {
-        router.push(`/patients/${user.$id}/new-appointment`);
+        router.push(`/patients/${user.$id}/register/success`);
       }
     } catch (error) {
       console.log(error);
@@ -114,15 +90,28 @@ const RegisterForm = ({ user }: { user: User }) => {
           </div>
 
           {/* NAME */}
+          <div className="flex flex-col gap-6 xl:flex-row">
+            <CustomFormField
+              fieldType={FormFieldType.INPUT}
+              control={form.control}
+              name="name"
+              placeholder="John Doe"
+              label="Name"
+              iconSrc="/assets/icons/user.svg"
+              iconAlt="user"
+            />
 
-          <CustomFormField
-            fieldType={FormFieldType.INPUT}
-            control={form.control}
-            name="name"
-            placeholder="John Doe"
-            iconSrc="/assets/icons/user.svg"
-            iconAlt="user"
-          />
+            {/* AGE */}
+            <CustomFormField
+              fieldType={FormFieldType.INPUT}
+              control={form.control}
+              name="age"
+              label="Age"
+              placeholder="25"
+              iconSrc="/assets/icons/user.svg"
+              iconAlt="age"
+            />
+          </div>
 
           {/* EMAIL & PHONE */}
           <div className="flex flex-col gap-6 xl:flex-row">
@@ -224,48 +213,14 @@ const RegisterForm = ({ user }: { user: User }) => {
             <h2 className="sub-header">Medical Information</h2>
           </div>
 
-          {/* PRIMARY CARE PHYSICIAN */}
+          {/* BLOOD GROUP */}
           <CustomFormField
-            fieldType={FormFieldType.SELECT}
+            fieldType={FormFieldType.INPUT}
             control={form.control}
-            name="primaryPhysician"
-            label="Primary care physician"
-            placeholder="Select a physician"
-          >
-            {Doctors.map((doctor, i) => (
-              <SelectItem key={doctor.name + i} value={doctor.name}>
-                <div className="flex cursor-pointer items-center gap-2">
-                  <Image
-                    src={doctor.image}
-                    width={32}
-                    height={32}
-                    alt="doctor"
-                    className="rounded-full border border-dark-500"
-                  />
-                  <p>{doctor.name}</p>
-                </div>
-              </SelectItem>
-            ))}
-          </CustomFormField>
-
-          {/* INSURANCE & POLICY NUMBER */}
-          <div className="flex flex-col gap-6 xl:flex-row">
-            <CustomFormField
-              fieldType={FormFieldType.INPUT}
-              control={form.control}
-              name="insuranceProvider"
-              label="Insurance provider"
-              placeholder="BlueCross BlueShield"
-            />
-
-            <CustomFormField
-              fieldType={FormFieldType.INPUT}
-              control={form.control}
-              name="insurancePolicyNumber"
-              label="Insurance policy number"
-              placeholder="ABC123456789"
-            />
-          </div>
+            name="bloodGroup"
+            label="Blood Group"
+            placeholder="A+"
+          />
 
           {/* ALLERGY & CURRENT MEDICATIONS */}
           <div className="flex flex-col gap-6 xl:flex-row">
@@ -280,9 +235,9 @@ const RegisterForm = ({ user }: { user: User }) => {
             <CustomFormField
               fieldType={FormFieldType.TEXTAREA}
               control={form.control}
-              name="currentMedication"
-              label="Current medications"
-              placeholder="Ibuprofen 200mg, Levothyroxine 50mcg"
+              name="chronicDiseases"
+              label="Chronic diseases (if any)"
+              placeholder="Heart disease, Diabetes"
             />
           </div>
 
@@ -300,79 +255,10 @@ const RegisterForm = ({ user }: { user: User }) => {
               fieldType={FormFieldType.TEXTAREA}
               control={form.control}
               name="pastMedicalHistory"
-              label="Past medical history"
+              label="Past medical history(if any)"
               placeholder="Appendectomy in 2015, Asthma diagnosis in childhood"
             />
           </div>
-        </section>
-
-        {/* <section className="space-y-6">
-          <div className="mb-9 space-y-1">
-            <h2 className="sub-header">Identification and Verfication</h2>
-          </div>
-
-          <CustomFormField
-            fieldType={FormFieldType.SELECT}
-            control={form.control}
-            name="identificationType"
-            label="Identification Type"
-            placeholder="Select identification type"
-          >
-            {IdentificationTypes.map((type, i) => (
-              <SelectItem key={type + i} value={type}>
-                {type}
-              </SelectItem>
-            ))}
-          </CustomFormField>
-
-          <CustomFormField
-            fieldType={FormFieldType.INPUT}
-            control={form.control}
-            name="identificationNumber"
-            label="Identification Number"
-            placeholder="123456789"
-          />
-
-          <CustomFormField
-            fieldType={FormFieldType.SKELETON}
-            control={form.control}
-            name="identificationDocument"
-            label="Scanned Copy of Identification Document"
-            renderSkeleton={(field) => (
-              <FormControl>
-                <FileUploader files={field.value} onChange={field.onChange} />
-              </FormControl>
-            )}
-          />
-        </section> */}
-
-        <section className="space-y-6">
-          <div className="mb-9 space-y-1">
-            <h2 className="sub-header">Consent and Privacy</h2>
-          </div>
-
-          <CustomFormField
-            fieldType={FormFieldType.CHECKBOX}
-            control={form.control}
-            name="treatmentConsent"
-            label="I consent to receive treatment for my health condition."
-          />
-
-          <CustomFormField
-            fieldType={FormFieldType.CHECKBOX}
-            control={form.control}
-            name="disclosureConsent"
-            label="I consent to the use and disclosure of my health
-            information for treatment purposes."
-          />
-
-          <CustomFormField
-            fieldType={FormFieldType.CHECKBOX}
-            control={form.control}
-            name="privacyConsent"
-            label="I acknowledge that I have reviewed and agree to the
-            privacy policy"
-          />
         </section>
 
         <SubmitButton isLoading={isLoading}>Submit and Continue</SubmitButton>

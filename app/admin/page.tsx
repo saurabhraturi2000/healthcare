@@ -1,12 +1,14 @@
 import Link from "next/link";
 
-import { StatCard } from "@/components/StatCard";
-import { columns } from "@/components/table/columns";
+// import { StatCard } from "@/components/StatCard";
 import { DataTable } from "@/components/table/DataTable";
-import { getRecentAppointmentList } from "@/lib/actions/appointment.actions";
+import { patientsColumns } from "@/components/table/patientsColumns";
+// import { getRecentAppointmentList } from "@/lib/actions/appointment.actions";
+import { getRecentPatientList } from "@/lib/actions/patient.actions";
 
 const AdminPage = async () => {
-  const appointments = await getRecentAppointmentList();
+  // const appointments = await getRecentAppointmentList();
+  const patients = await getRecentPatientList();
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col space-y-14">
@@ -29,11 +31,11 @@ const AdminPage = async () => {
         <section className="w-full space-y-4">
           <h1 className="header">Welcome 👋</h1>
           <p className="text-dark-700">
-            Start the day with managing new appointments
+            Welcome to the admin dashboard. Here you can manage your patients
           </p>
         </section>
 
-        <section className="admin-stat">
+        {/* <section className="admin-stat">
           <StatCard
             type="appointments"
             count={appointments.scheduledCount}
@@ -52,9 +54,10 @@ const AdminPage = async () => {
             label="Cancelled appointments"
             icon={"/assets/icons/cancelled.svg"}
           />
-        </section>
+        </section> */}
 
-        <DataTable columns={columns} data={appointments.documents} />
+        <DataTable columns={patientsColumns} data={patients.documents} />
+        {/* <DataTable columns={columns} data={appointments.documents} /> */}
       </main>
     </div>
   );
